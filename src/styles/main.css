@@ -1,0 +1,125 @@
+:root {
+  --ink: #1a0f24;
+  --paper: #fff4dc;
+  --red: #ff2a5c;
+  --blue: #2f7dff;
+  --gold: #ffd23a;
+  --font: 'Noto Sans TC', system-ui, sans-serif;
+  --display: 'Bangers', 'Noto Sans TC', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #22142c; font-family: var(--font); color: var(--ink); user-select: none; -webkit-user-select: none; touch-action: none; }
+#app, canvas { display: block; width: 100vw; height: 100vh; }
+.hidden { display: none !important; }
+
+.ui { position: fixed; inset: 0; pointer-events: none; }
+.ui button, .ui select, .ui input, .ui label, .screen, .story { pointer-events: auto; }
+
+/* —— 漫畫元件 —— */
+.comic-panel { background: var(--paper); border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); border-radius: 6px; }
+.comic-pill { background: var(--paper); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); border-radius: 999px; padding: 4px 14px; font-weight: 900; }
+.btn { font-family: var(--font); font-weight: 900; font-size: 17px; padding: 10px 20px; border: 3px solid var(--ink); background: var(--paper); box-shadow: 4px 4px 0 var(--ink); border-radius: 8px; cursor: pointer; transition: transform .08s, box-shadow .08s; color: var(--ink); }
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); background: #fff; }
+.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.btn:disabled { opacity: .4; pointer-events: none; }
+.btn.big { font-size: 22px; padding: 12px 30px; background: var(--gold); }
+.btn.small { font-size: 14px; padding: 6px 12px; }
+.btn.ghost { background: transparent; }
+
+/* —— HUD —— */
+.hud { position: absolute; inset: 0; }
+.hud-tl { position: absolute; left: 16px; top: 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.lives .heart { color: #ff5aa0; }
+.lives.shake { animation: shake .4s; }
+.phase-badge { display: flex; gap: 8px; align-items: center; font-size: 16px; color: #fff; }
+.phase-badge.red { background: var(--red); }
+.phase-badge.blue { background: var(--blue); }
+.phase-badge.pop { animation: pop .35s; }
+.phase-sym { font-size: 18px; }
+.hud-top { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); display: flex; gap: 10px; }
+.goal { font-size: 14px; max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.timer { font-family: var(--display); font-size: 22px; letter-spacing: 1px; padding: 0 16px; }
+.timer.urgent { background: var(--red); color: #fff; animation: pulse .5s infinite alternate; }
+.hud-tr { position: absolute; right: 16px; top: 14px; display: flex; gap: 10px; }
+.icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper); box-shadow: 3px 3px 0 var(--ink); font-weight: 900; font-size: 18px; cursor: pointer; }
+.bossbar { position: absolute; left: 50%; top: 62px; transform: translateX(-50%); width: min(560px, 80vw); }
+.bossbar-name { font-family: var(--display); font-size: 22px; color: var(--paper); text-shadow: 2px 2px 0 var(--ink), -1px -1px 0 var(--ink); text-align: center; letter-spacing: 2px; }
+.bossbar-track { height: 18px; border: 3px solid var(--ink); background: #3a2238; border-radius: 4px; box-shadow: 3px 3px 0 var(--ink); overflow: hidden; }
+.bossbar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--red), #b070ff 50%, var(--blue)); transition: width .3s; }
+.banner { position: absolute; left: 50%; top: 22%; transform: translateX(-50%) rotate(-1.5deg); background: var(--paper); border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 10px 22px; font-weight: 900; font-size: clamp(16px, 2.2vw, 24px); text-align: center; max-width: 86vw; animation: slam .3s; }
+.banner.red { background: var(--red); color: #fff; }
+.banner.blue { background: var(--blue); color: #fff; }
+.tutorial { position: absolute; left: 50%; bottom: 64px; transform: translateX(-50%); max-width: min(640px, 88vw); background: var(--paper); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); border-radius: 14px; padding: 10px 18px 10px 54px; font-size: 15px; font-weight: 500; animation: rise .3s; }
+.tutorial::before { content: '燈芯'; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; background: var(--gold); border: 3px solid var(--ink); font-size: 11px; font-weight: 900; display: grid; place-items: center; }
+.toast { position: absolute; left: 50%; top: 36%; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 6px 16px; border-radius: 6px; font-weight: 900; animation: pop .25s; }
+.hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); color: var(--paper); opacity: .75; font-size: 12px; text-shadow: 1px 1px 0 var(--ink); white-space: nowrap; }
+.flash { position: absolute; inset: 0; opacity: 0; mix-blend-mode: screen; }
+.flash.go { animation: flash .35s; }
+.speedlines { position: absolute; inset: -10%; opacity: 0; background: repeating-conic-gradient(from 0deg, transparent 0 4deg, rgba(255,255,255,.55) 4deg 5deg); -webkit-mask: radial-gradient(circle, transparent 35%, #000 70%); mask: radial-gradient(circle, transparent 35%, #000 70%); }
+.speedlines.go { animation: flash .3s; }
+
+/* —— 觸控 —— */
+.touch { display: none; }
+.is-touch .touch { display: block; }
+.is-touch .hint { display: none; }
+.joy { position: absolute; left: 28px; bottom: 34px; width: 130px; height: 130px; border-radius: 50%; border: 3px solid rgba(255,244,220,.7); background: rgba(26,15,36,.3); pointer-events: auto; touch-action: none; }
+.joy-knob { position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px; border-radius: 50%; background: var(--paper); border: 3px solid var(--ink); }
+.touch-btns { position: absolute; right: 24px; bottom: 30px; display: flex; gap: 12px; align-items: flex-end; }
+.touch-btns button { width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper); box-shadow: 3px 3px 0 var(--ink); font-weight: 900; touch-action: none; }
+.touch-btns button.big { width: 86px; height: 86px; background: var(--gold); font-size: 22px; }
+
+/* —— 畫面 —— */
+.screen { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(26, 15, 36, .45); }
+.screen.menu { background: linear-gradient(180deg, rgba(26,15,36,.1), rgba(26,15,36,.65)); }
+.menu-card { display: flex; flex-direction: column; gap: 12px; align-items: stretch; padding: 26px 30px; min-width: min(380px, 90vw); max-width: 92vw; }
+.menu-card h2 { margin: 0 0 6px; font-family: var(--display); font-size: 34px; letter-spacing: 2px; text-align: center; }
+.menu-card.wide { width: min(900px, 94vw); }
+.menu-card label { font-weight: 500; display: flex; flex-direction: column; gap: 6px; }
+.menu-card label.check { flex-direction: row; align-items: center; gap: 8px; }
+.menu-card select { font: inherit; padding: 6px; border: 3px solid var(--ink); border-radius: 6px; background: #fff; }
+.logo { text-align: center; margin-bottom: 18px; }
+.logo-zh { font-weight: 900; font-size: clamp(48px, 9vw, 92px); line-height: 1; letter-spacing: 4px; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 6px 6px 0 var(--ink); transform: rotate(-3deg); }
+.logo-zh .r { color: var(--red); }
+.logo-zh .b { color: var(--blue); }
+.logo-sub { font-family: var(--display); color: var(--paper); font-size: clamp(16px, 2.4vw, 24px); letter-spacing: 3px; text-shadow: 2px 2px 0 var(--ink); margin-top: 10px; }
+.menu-btns { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.menu-btns .btn { min-width: 240px; }
+.level-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.level-row .btn { min-width: 0; }
+.asset-note { color: var(--paper); font-size: 12px; text-align: center; opacity: .8; text-shadow: 1px 1px 0 var(--ink); margin-top: 8px; max-width: 520px; }
+.result-body { text-align: center; font-size: 16px; }
+.loading { background: #22142c; color: var(--paper); gap: 12px; align-content: center; }
+.loading-text { font-family: var(--display); font-size: 32px; letter-spacing: 3px; }
+.loading-bar { width: 260px; height: 14px; border: 3px solid var(--paper); border-radius: 4px; }
+.loading-bar div { height: 100%; width: 0; background: var(--gold); transition: width .2s; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; max-height: 60vh; overflow: auto; padding: 4px; }
+.gallery-item { aspect-ratio: 4 / 3; border: 3px solid var(--ink); border-radius: 6px; background: #3a2238 center/cover; display: flex; align-items: flex-end; padding: 0; cursor: pointer; overflow: hidden; }
+.gallery-item span { width: 100%; background: var(--paper); border-top: 3px solid var(--ink); font-weight: 900; font-size: 13px; padding: 4px; }
+.gallery-item.locked { cursor: default; }
+
+/* —— 故事分格 —— */
+.story { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(15, 8, 22, .82); z-index: 5; }
+.story-card { width: min(980px, 94vw); max-height: 94vh; display: flex; flex-direction: column; overflow: hidden; }
+.story-card.pop { animation: slam .35s; }
+.story-art { width: 100%; max-height: 62vh; background-repeat: no-repeat; border-bottom: 4px solid var(--ink); background-color: #2a1a33; }
+.story-caption { padding: 12px 18px 4px; }
+.story-title { display: inline-block; font-weight: 900; font-size: 20px; background: var(--ink); color: var(--paper); padding: 2px 12px; transform: rotate(-1.5deg); margin-bottom: 6px; }
+.story-text { font-size: 16px; line-height: 1.6; }
+.story-nav { display: flex; gap: 10px; align-items: center; justify-content: flex-end; padding: 8px 14px 14px; flex-wrap: wrap; }
+.story-count { font-weight: 900; margin-right: auto; padding-left: 4px; }
+@media (max-width: 640px) {
+  .story-art { max-height: 44vh; }
+  .story-text { font-size: 14px; }
+  .goal { max-width: 40vw; }
+}
+
+.fatal { position: fixed; inset: 0; display: grid; place-content: center; text-align: center; background: #22142c; color: var(--paper); padding: 20px; }
+
+@keyframes pop { 0% { transform: scale(.6); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes slam { 0% { transform: translateX(-50%) scale(1.6) rotate(-6deg); opacity: 0; } 100% { opacity: 1; } }
+.story-card.pop { animation: storypop .35s; }
+@keyframes storypop { 0% { transform: scale(.85) rotate(-2deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes rise { from { transform: translate(-50%, 20px); opacity: 0; } }
+@keyframes flash { 0% { opacity: .75; } 100% { opacity: 0; } }
+@keyframes pulse { to { transform: scale(1.1); } }
+@keyframes shake { 0%,100% { transform: none; } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
